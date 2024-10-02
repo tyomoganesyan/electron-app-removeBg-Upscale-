@@ -1,9 +1,10 @@
+import React from 'react';
 import styles from '../assets/index.module.css';
 import { IProps } from './types';
 
 
 
-export const DragAndDrop = ({ files, setFiles }: IProps) => {
+export const DragAndDrop = ({ files, setFiles, isUpscale, upscaleFactor, setUpscaleFactor }: IProps) => {
 
     const preventDefaults = (e: React.DragEvent) => {
         e.preventDefault()
@@ -13,13 +14,16 @@ export const DragAndDrop = ({ files, setFiles }: IProps) => {
     const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files?.length) {
             const dFiles = Array.from(e.target.files);
-            const arr = dFiles.map((file) => ({
-                name: file.name,
-                type: file.type,
-                size: file.size,
-                id: Date.now() + Math.random()
-            }));
-            setFiles((prevFiles) => prevFiles.concat(arr));
+            if (dFiles.every(file =>
+                file.type === 'image/jpeg' ||
+                file.type === 'image/png' ||
+                file.type === 'image/webp' ||
+                file.type === 'image/bmp' ||
+                file.type === 'image/tiff' ||
+                file.type === 'image/svg+xml'
+            )) {
+                return setFiles((prevFiles) => prevFiles.concat(dFiles));
+            }
         }
     }
 
@@ -27,22 +31,39 @@ export const DragAndDrop = ({ files, setFiles }: IProps) => {
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
-
         if (e.dataTransfer.files.length) {
             const dFiles = Array.from(e.dataTransfer.files);
-            const arr = dFiles.map((file) => ({
-                name: file.name,
-                type: file.type,
-                size: file.size,
-                id: Date.now() + Math.random()
-            }));
-            setFiles((prevFiles) => prevFiles.concat(arr));
+            if (dFiles.every(file =>
+                file.type === 'image/jpeg' ||
+                file.type === 'image/png' ||
+                file.type === 'image/webp' ||
+                file.type === 'image/bmp' ||
+                file.type === 'image/tiff' ||
+                file.type === 'image/svg+xml'
+            )) {
+                return setFiles((prevFiles) => prevFiles.concat(dFiles));
+            }
         }
     }
 
+    const handleUpscale = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = +e.target.value;
+        if(setUpscaleFactor) {
+            setUpscaleFactor(prevUpscaleFactor => {
+                const newUpscaleFactor = [...prevUpscaleFactor];
+                if (value > 0) {
+                    newUpscaleFactor[index] = value;
+                } else {
+                    newUpscaleFactor[index] = undefined; 
+                }
+                return newUpscaleFactor;
+            });
+        }
+    };
+
 
     const handleRemove = (id: number) => {
-        setFiles((prevFiles) => prevFiles.filter((file) => file.id !== id));
+        setFiles((prevFiles) => prevFiles.filter((_, index) => index !== id));
     }
 
 
@@ -82,15 +103,30 @@ export const DragAndDrop = ({ files, setFiles }: IProps) => {
                             <th>File</th>
                             <th>Output</th>
                             <th></th>
+                            {
+                                isUpscale && <th></th>
+                            }
                         </tr>
                     </thead>
                     <tbody >
 
-                        {files.map(file =>
-                            <tr key={file.id}>
+                        {files.map((file, index) =>
+                            <tr key={index}>
                                 <td>{file.name}</td>
                                 <td>full path name</td>
-                                <td><button className={styles.remove} onClick={() => handleRemove(file.id)}>X</button></td>
+                                <td><button className={styles.remove} onClick={() => handleRemove(index)}>X</button></td>
+                                {
+                                    isUpscale && <td>
+
+                                        <input
+                                            className={styles.input}
+                                            placeholder="upscale factor"
+                                            type='number' step={1}
+                                            value={upscaleFactor[index] || ''}
+                                            onChange={(e) => handleUpscale(index, e)}
+                                        />
+                                    </td>
+                                }
                             </tr>
                         )
                         }
@@ -100,6 +136,4 @@ export const DragAndDrop = ({ files, setFiles }: IProps) => {
 
         </div>
     </>
-
-
 }

@@ -4,10 +4,11 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import settings from '../assets/settings.png'; 
+import settings from '../assets/settings.png';
 import { Settings } from './Settings';
+import { NavbarProps } from './types';
 
-const Navbar = () => {
+const Navbar: React.FC<NavbarProps> = ({ apiKey, setApiKey }) => {
     const [open, setOpen] = useState(false);
 
     const handleClickOpen = () => {
@@ -59,7 +60,12 @@ const Navbar = () => {
                     </IconButton>
                 </Toolbar>
             </AppBar>
-            <Settings open={open} handleClose={handleClose} />
+            <Settings
+                open={open}
+                handleClose={handleClose}
+                apiKey={apiKey}
+                setApiKey={setApiKey}
+            />
         </>
     );
 };

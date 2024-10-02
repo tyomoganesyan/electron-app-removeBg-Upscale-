@@ -1,11 +1,38 @@
-export interface IFile {
-    name: string
-    type: string
-    size: number
-    id: number
-}
 
 export interface IProps {
-    files:IFile[]
-    setFiles:React.Dispatch<React.SetStateAction<IFile[]>>;
+    files:File[]
+    setFiles:React.Dispatch<React.SetStateAction<File[]>>
+    isUpscale:boolean
+    upscaleFactor?:(number | string)[]
+    setUpscaleFactor?:React.Dispatch<React.SetStateAction<(number | string)[]>>
+
+}
+
+export interface IResponse  {
+    status:string
+    fileName:string
+    data:{
+        id:string
+        url:string
+    }
+}
+
+export interface CProps {
+    apiKey:string
+}
+
+
+export interface SettingsProps {
+    open: boolean;
+    handleClose: () => void;
+    apiKey: string;
+    setApiKey: (key: string) => void;
+}
+export interface NavbarProps {
+    apiKey: string;
+    setApiKey: (key: string) => void;
+}
+
+export interface IError {
+    
 }
