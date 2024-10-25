@@ -2,30 +2,35 @@
 import { useState } from 'react';
 import { DragAndDrop } from './DragAndDrop';
 import styles from '../assets/index.module.css';
-import { CProps, IResponse } from './types';
+import { IResponse } from '../utils/types';
 import axios, { AxiosRequestConfig } from 'axios';
+import ErrorPopup from '../utils/Error';
+import { Box, FormControl, MenuItem, Select, StepLabel } from '@mui/material';
 
 
-export const Upscale = ({ apiKey }: CProps) => {
+export const Upscale = () => {
 
     const [files, setFiles] = useState<File[]>([]);
     const [handledFiles, setHandledFiles] = useState<IResponse[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [upscaleFactor, setUpscaleFactor] = useState<(number | string)[]>([]);
-    const [error, setError] = useState<string>("")
+    const [isError, setIsError] = useState<boolean>(false);
+    const [format, setFormat] = useState('JPG');
+    const [errorMessage, setErrorMessage] = useState('');
+    const apiKey = window.api.readApiKey();
 
     async function processFiles(): Promise<IResponse[]> {
         console.log(apiKey);
         setLoading(true)
         const handledImages: IResponse[] = [];
-        // const apiKey = "eyJraWQiOiI5NzIxYmUzNi1iMjcwLTQ5ZDUtOTc1Ni05ZDU5N2M4NmIwNTEiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJhdXRoLXNlcnZpY2UtMWE2YWJjN2YtZjcyMS00NGRmLThmYWMtYjZkOGRhMDM5YTQzIiwiYXVkIjoiMjI3ODc3ODkwMDI4MTAyIiwibmJmIjoxNzI0MjMzNjY0LCJzY29wZSI6WyJiMmItYXBpLmdlbl9haSIsImIyYi1hcGkuaW1hZ2VfYXBpIl0sImlzcyI6Imh0dHBzOi8vYXBpLnBpY3NhcnQuY29tL3Rva2VuLXNlcnZpY2UiLCJvd25lcklkIjoiMjI3ODc3ODkwMDI4MTAyIiwiaWF0IjoxNzI0MjMzNjY0LCJqdGkiOiJkNzRjM2FhMS00ZTk3LTQ4MmEtYmIyOS1iMzcxY2Y1ZTFjYTUifQ.IlRiqhz6SEl2wF1pp0JDo7pkpGyht4k-9IV3GwY7B3YRjpfl-PCVwL-uHFGCtaEOJ33YEUGfsYZSIfZpPU01IrW-WQcosPtTSbnEEG_HYXOZZnk6T_o9YlUTOq-y2Y2Ca5o7w64fwMbdfPlZud0YGaxcxwrCI7G0nRlMrUhDDU56T1LA7g4yytFZNhbjT26P2Oe3gp7_ScNaMi0aegP-RUqmLZNPD6IRSmDS_6Xntw2n4riM-fDiJlT-krUdOqI8liUh-cWQvgmxeJz2ZYZfj_zEWKUdR4_yUqiOwGy3ospa27_1bh7MItBUoJ2argm0c1D0acRFbVxzRfQSzOFP6Q";
         for (const file of files) {
             let index = 0;
             console.log(file)
             const formData = new FormData();
             formData.append('image', file);
-            formData.append('upscale_factor', String(upscaleFactor[index]))
-            index++
+            formData.append('format', format);
+            formData.append('upscale_factor', String(upscaleFactor[index]) === 'undefined' ? '2' : String(upscaleFactor[index]));
+            index++;
             const options: AxiosRequestConfig = {
                 method: 'POST',
                 url: 'https://api.picsart.io/tools/1.0/upscale',
@@ -42,8 +47,10 @@ export const Upscale = ({ apiKey }: CProps) => {
 
             } catch (err: any) {
                 console.error(err);
-                if (err.status == 401)
-                    setError("Token is not Provided");
+                if (err.status == 401) {
+                    setIsError(true);
+                    setErrorMessage("API key is not Provided");
+                }
             }
         }
         setLoading(false);
@@ -74,33 +81,43 @@ export const Upscale = ({ apiKey }: CProps) => {
 
 
     return <>
-        <DragAndDrop files={files} setFiles={setFiles} isUpscale={true} upscaleFactor={upscaleFactor} setUpscaleFactor={setUpscaleFactor} />
-        <div className={styles.container}>
+        <DragAndDrop
+            files={files}
+            setFiles={setFiles}
+            isUpscale={true}
+            upscaleFactor={upscaleFactor}
+            setUpscaleFactor={setUpscaleFactor}
+            loading={loading}
+            handledFiles={handledFiles}
+            handleSave={handleSave}
+            setHandledFiles={setHandledFiles}
+        />
+        <div className={styles.cont}>
+            <ErrorPopup
+                open={isError}
+                handleClose={() => setIsError(false)}
+                errorMessage={errorMessage}
+            />
+        </div >
+        <Box sx={{ display: "flex", gap: 2, marginLeft: 5, width: 'auto', height: 45, marginBottom: 2 }}>
+            <Box sx={{ display: "flex", alignItems: 'center' }}>
+                <StepLabel sx={{ marginRight: 1 }}>Format</StepLabel>
+                <FormControl>
+                    <Select
+                        value={format}
+                        sx={{ width: 100, height: 30 }}
+                        onChange={(e) => setFormat(e.target.value)}
+                    >
+                        <MenuItem value='JPG'>JPG</MenuItem>
+                        <MenuItem value='PNG'>PNG</MenuItem>
+                        <MenuItem value='WEBP'>WEBP</MenuItem>
+                    </Select>
+                </FormControl>
+            </Box>
+        </Box >
+        <div className={styles.end}>
             <button className={styles.start} onClick={processFiles}>Process</button>
         </div>
-        <div className={styles.cont}>
-            {
-                error &&
-                <h3 className={styles.error}>{error}</h3>
-            }
-            {loading ? (
-                <img className={styles.loader} src="https://media.dev.to/cdn-cgi/image/width=1080,height=1080,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fdkf5jym2t51hf098ppgs.gif" alt="Loading..." />
-            ) : (
-                handledFiles.length ? (
-                    <ul>
-                        {handledFiles.map((file) => (
-                            <li key={file.data.id}>
-                                <p>{file.fileName}</p>
-                                <div className={styles.btns}>
-                                    <button onClick={() => handleSave(file.data.url, file.fileName)}>save</button>
-                                    <button>share</button>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                ) : null
-            )}
-        </div >
     </>
 
 };

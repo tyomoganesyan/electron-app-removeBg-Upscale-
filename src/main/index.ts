@@ -14,9 +14,10 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
+      webSecurity: false,
       nodeIntegration: true,
       contextIsolation: false,
-      allowRunningInsecureContent: true, 
+      allowRunningInsecureContent: true,
     }
   })
 
@@ -38,6 +39,22 @@ function createWindow(): void {
   }
 }
 
+
+/////////////////////////
+const createPreviewWindow = (url) => {
+  const previewWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      contextIsolation: true,
+      // Add other settings as necessary
+    },
+  });
+
+  previewWindow.loadURL(url); // Load the URL directly in the new window
+};
+//////////////////////
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -54,6 +71,13 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
+
+///////////////////////////
+  ipcMain.on('preview-file', (event, fileData) => {
+    createPreviewWindow(fileData.url); // Call the function to create a preview window
+  });
+//////////////////////////
+
 
   createWindow()
 
