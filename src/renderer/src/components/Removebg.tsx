@@ -16,6 +16,7 @@ export const Removebg = () => {
     const [isError, setIsError] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [outputType, setOutputType] = useState('cutout');
+    const [isApiError, setIsApiError] = useState<boolean>(false);
     const [format, setFormat] = useState('JPG');
     const [color, setColor] = useState('#FFFFFF');
     const [selectedOption, setSelectedOption] = useState<IOptions>({
@@ -33,11 +34,17 @@ export const Removebg = () => {
 
     async function processFiles(): Promise<IResponse[]> {
 
+        if (!navigator.onLine) {
+            setIsError(true);
+            setLoading(false);
+            setErrorMessage("No internet connection. Please check your network and try again.");
+            return handledFiles;
+        }
+
         setLoading(true);
         const handledImages: IResponse[] = [];
 
         for (const file of files) {
-
             const formData = new FormData();
             formData.append('image', file);
             formData.append('output_type', outputType)
@@ -69,7 +76,10 @@ export const Removebg = () => {
                 console.error(err);
                 if (err.status == 401) {
                     setIsError(true);
-                    setErrorMessage("API key is not Provided");
+                    setLoading(false);
+                    setIsApiError(true);
+                    setErrorMessage('Authorization failed');
+                    return handledFiles;
                 }
             }
         }
@@ -130,6 +140,7 @@ export const Removebg = () => {
                 open={isError}
                 handleClose={() => setIsError(false)}
                 errorMessage={errorMessage}
+                isApiError={isApiError}
             />
         </div >
         <div className={styles.end}>

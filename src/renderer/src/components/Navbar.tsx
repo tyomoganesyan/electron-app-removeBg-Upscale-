@@ -15,8 +15,11 @@ const Navbar: React.FC = () => {
     const [openBalance, setOpenBalance] = useState(false);
     const [balance, setBalance] = useState<number | undefined>();
     const [isError, setIsError] = useState<boolean>(false);
-    const [errorMessage, setErrorMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState<string>('');
+    const [isApiError, setIsApiError] = useState<boolean>(false);
     const apiKey = window.api.readApiKey();
+
+
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -27,6 +30,14 @@ const Navbar: React.FC = () => {
     };
 
     const handleOpenBalance = async () => {
+
+        if (!navigator.onLine) {
+            setIsError(true);
+            setIsApiError(false);
+            setErrorMessage("No internet connection. Please check your network and try again.");
+            return;
+        }
+
         const options = {
             method: 'GET',
             headers: {
@@ -38,6 +49,7 @@ const Navbar: React.FC = () => {
             let response = await fetch('https://genai-api.picsart.io/v1/balance', options);
             if (response.status == 401) {
                 setIsError(true);
+                setIsApiError(true);
                 setErrorMessage('Authorization failed');
             }
             const result = await response.json();
@@ -47,7 +59,6 @@ const Navbar: React.FC = () => {
             }
         }
         catch (error: unknown) {
-            console.log(error, 'stexxx');
             if (error instanceof Error) {
                 setIsError(true);
                 setErrorMessage('Authorization failed');
@@ -118,6 +129,7 @@ const Navbar: React.FC = () => {
                 open={isError}
                 handleClose={() => setIsError(false)}
                 errorMessage={errorMessage}
+                isApiError={isApiError}
             />
             {
                 balance &&

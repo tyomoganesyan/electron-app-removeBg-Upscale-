@@ -19,6 +19,7 @@ export interface IResponse {
         id: string
         url: string
     }
+
 }
 
 export interface CProps {
@@ -51,6 +52,7 @@ export interface ErrorPopupProps {
     open: boolean;
     handleClose: () => void;
     errorMessage: string;
+    isApiError: boolean
 }
 
 export interface InputValues {

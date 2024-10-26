@@ -3,7 +3,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, 
 import { ErrorPopupProps } from './types';
 
 
-const ErrorPopup: React.FC<ErrorPopupProps> = ({ open, handleClose, errorMessage }) => {
+const ErrorPopup: React.FC<ErrorPopupProps> = ({ open, handleClose, errorMessage, isApiError }) => {
     return (
         <Dialog
             open={open} onClose={handleClose}
@@ -26,7 +26,7 @@ const ErrorPopup: React.FC<ErrorPopupProps> = ({ open, handleClose, errorMessage
                     textAlign="center"
                 >
                     <Typography color="error">{errorMessage}</Typography>
-                    <Link
+                    {isApiError && <Link
                         href="https://docs.picsart.io/docs/creative-apis-get-api-key"
                         target="_blank"
                         rel="noopener"
@@ -34,6 +34,7 @@ const ErrorPopup: React.FC<ErrorPopupProps> = ({ open, handleClose, errorMessage
                     >
                         Get your API key
                     </Link>
+                    }
                 </Box>
             </DialogContent>
             <DialogActions>

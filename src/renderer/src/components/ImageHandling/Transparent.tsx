@@ -125,7 +125,7 @@ export const Transparent = ({ output, selectedOptions, setSelectedOptions }: ITP
                     <StepLabel sx={{ color: 'HighlightText' }}>Shadow opacity</StepLabel>
                     <Select
                         sx={{ width: 140, height: 30 }}
-                        value={selectedOptions.shadow_opacity}
+                        value={selectedOptions.shadow_opacity || '0%'}
                         onChange={handleOpacityChange}
                         disabled={selectedOptions.shadow === 'disabled'}
                     >
@@ -139,7 +139,7 @@ export const Transparent = ({ output, selectedOptions, setSelectedOptions }: ITP
                     <StepLabel>Shadow blur</StepLabel>
                     <Select
                         sx={{ width: 140, height: 30 }}
-                        value={selectedOptions.shadow_blur}
+                        value={selectedOptions.shadow_blur || '0%'}
                         onChange={handleBlurChange}
                         disabled={selectedOptions.shadow === 'disabled'}
                     >

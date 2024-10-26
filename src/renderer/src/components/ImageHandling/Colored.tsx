@@ -4,7 +4,7 @@ import { SketchPicker } from 'react-color';
 import ColorLensIcon from '@mui/icons-material/ColorLens';
 
 export const Colored = ({color, setColor}) => {
-    // const [color, setColor] = useState('#FFFFFF');
+
     const [tempColor, setTempColor] = useState(color);
     const [displayColorPicker, setDisplayColorPicker] = useState(false);
 
@@ -30,7 +30,7 @@ export const Colored = ({color, setColor}) => {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setColor(e.target.value);
     };
-    console.log(color);
+
     return (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>

@@ -15,12 +15,20 @@ export const Upscale = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [upscaleFactor, setUpscaleFactor] = useState<(number | string)[]>([]);
     const [isError, setIsError] = useState<boolean>(false);
+    const [isApiError, setIsApiError] = useState<boolean>(false);
     const [format, setFormat] = useState('JPG');
     const [errorMessage, setErrorMessage] = useState('');
     const apiKey = window.api.readApiKey();
 
     async function processFiles(): Promise<IResponse[]> {
-        console.log(apiKey);
+
+        if (!navigator.onLine) {
+            setIsError(true);
+            setLoading(false);
+            setErrorMessage("No internet connection. Please check your network and try again.");
+            return handledFiles;
+        };
+
         setLoading(true)
         const handledImages: IResponse[] = [];
         for (const file of files) {
@@ -49,7 +57,10 @@ export const Upscale = () => {
                 console.error(err);
                 if (err.status == 401) {
                     setIsError(true);
-                    setErrorMessage("API key is not Provided");
+                    setLoading(false);
+                    setIsApiError(true);
+                    setErrorMessage('Authorization failed');
+                    return handledFiles;
                 }
             }
         }
@@ -97,6 +108,7 @@ export const Upscale = () => {
                 open={isError}
                 handleClose={() => setIsError(false)}
                 errorMessage={errorMessage}
+                isApiError={isApiError}
             />
         </div >
         <Box sx={{ display: "flex", gap: 2, marginLeft: 5, width: 'auto', height: 45, marginBottom: 2 }}>
