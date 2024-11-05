@@ -40,12 +40,23 @@ export interface BalanceProps {
 
 export interface NavbarProps {
     apiKey: string;
+};
+
+export interface SavedState {
+    files: File[];
+    handledFiles: IResponse[];
+    outputType: string;
+    format: string;
+    color: string;
+    selectedOption: IOptions;
 }
 
 export interface Api {
     saveApiKey: (apiKey: string) => void;
     readApiKey: () => string | undefined;
     handlePreviewApi: (file: IResponse) => void;
+    loadState: (upscale: boolean) => Promise<SavedState>;
+    saveState: (currentState: SavedState | { format: string }, upscale: boolean) => void;
 }
 
 export interface ErrorPopupProps {

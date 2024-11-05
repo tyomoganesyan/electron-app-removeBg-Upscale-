@@ -73,7 +73,7 @@ app.whenReady().then(() => {
   ipcMain.on('ping', () => console.log('pong'))
 
 ///////////////////////////
-  ipcMain.on('preview-file', (event, fileData) => {
+  ipcMain.on('preview-file', (_, fileData) => {
     createPreviewWindow(fileData.url); // Call the function to create a preview window
   });
 //////////////////////////

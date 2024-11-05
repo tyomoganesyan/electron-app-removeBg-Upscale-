@@ -26,6 +26,7 @@ const api = {
       return null;
     }
   },
+
   handlePreviewApi: (fileData) => {
     const previewWindow = new BrowserWindow({
       width: 800,
@@ -34,9 +35,34 @@ const api = {
         contextIsolation: true,
       },
     });
-    previewWindow.loadURL(fileData.url); 
-  }
+    previewWindow.loadURL(fileData.url);
+  },
 
+  saveState: (state, upscale) => {
+    const filePath = upscale ? path.join(os.homedir(), 'removebg_state.json') : path.join(os.homedir(), 'upscale_state.json');
+    try {
+      fs.writeFileSync(filePath, JSON.stringify(state, null, 2), 'utf-8');
+      console.log('App state saved to', filePath);
+    } catch (error) {
+      console.error('Error saving state:', error);
+    }
+  },
+
+  loadState: (upscale) => {
+    const filePath = upscale ? path.join(os.homedir(), 'removebg_state.json') : path.join(os.homedir(), 'upscale_state.json');
+    try {
+      if (fs.existsSync(filePath)) {
+        const state = fs.readFileSync(filePath, 'utf8');
+        return JSON.parse(state);
+      } else {
+        console.log('No saved state found');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error loading state:', error);
+      return null;
+    }
+  },
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to
